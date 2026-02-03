@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be My Valentine 💖</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        overflow: hidden;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 25px;
+        text-align: center;
+        width: 320px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 10;
+    }
+
+    h1 {
+        color: #ff4d6d;
+    }
+
+    .buttons {
+        margin-top: 25px;
+        height: 150px;
+        position: relative;
+    }
+
+    button {
+        padding: 14px 26px;
+        font-size: 17px;
+        border: none;
+        border-radius: 40px;
+        cursor: pointer;
+        position: absolute;
+        transition: 0.15s;
+    }
+
+    #yes {
+        background: #ff4d6d;
+        color: white;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 10px;
+    }
+
+    #no {
+        background: #e0e0e0;
+        color: #333;
+        top: 20px;
+        left: 20px;
+    }
+
+    .celebration {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(135deg, #ff4d6d, #ff758f);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: white;
+        text-align: center;
+        z-index: 20;
+    }
+
+    .celebration h2 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .celebration p {
+        font-size: 22px;
+    }
+
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 30;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+    <h1>Will you be my Valentine? 💘</h1>
+    <div class="buttons">
+        <button id="yes">YES 💖</button>
+        <button id="no">NO 🙈</button>
+    </div>
+</div>
+
+<div class="celebration" id="celebration">
+    <h2>YAAAY!!! 🥰🎉</h2>
+    <p>You’re officially my Valentine 💐💖</p>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+/* -------- SMART NO BUTTON -------- */
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const card = document.getElementById("card");
+const celebration = document.getElementById("celebration");
+
+function moveNoSmartly(x, y) {
+    const padding = 60;
+    let newX = Math.random() * (window.innerWidth - noBtn.offsetWidth - padding);
+    let newY = Math.random() * (window.innerHeight - noBtn.offsetHeight - padding);
+
+    // Avoid YES button area
+    const yesRect = yesBtn.getBoundingClientRect();
+    if (
+        newX > yesRect.left - 80 &&
+        newX < yesRect.right + 80 &&
+        newY > yesRect.top - 80 &&
+        newY < yesRect.bottom + 80
+    ) {
+        newX += 120;
+        newY += 120;
+    }
+
+    noBtn.style.left = newX + "px";
+    noBtn.style.top = newY + "px";
+}
+
+document.addEventListener("mousemove", e => {
+    const rect = noBtn.getBoundingClientRect();
+    const distance = Math.hypot(
+        e.clientX - (rect.left + rect.width / 2),
+        e.clientY - (rect.top + rect.height / 2)
+    );
+
+    if (distance < 100) moveNoSmartly();
+});
+
+document.addEventListener("touchstart", e => {
+    moveNoSmartly();
+});
+
+/* -------- YES ACTION -------- */
+yesBtn.addEventListener("click", () => {
+    card.style.display = "none";
+    celebration.style.display = "flex";
+    startConfetti();
+});
+
+/* -------- CONFETTI -------- */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+
+function startConfetti() {
+    for (let i = 0; i < 200; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * 200,
+            color: ["💖","🎉","💘","💕","✨"][Math.floor(Math.random()*5)]
+        });
+    }
+    animateConfetti();
+}
+
+function animateConfetti() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.font = "24px serif";
+
+    confetti.forEach(c => {
+        ctx.fillText(c.color, c.x, c.y);
+        c.y += Math.random() * 3 + 2;
+        c.x += Math.sin(c.d);
+    });
+
+    requestAnimationFrame(animateConfetti);
+}
+</script>
+
+</body>
+</html>
